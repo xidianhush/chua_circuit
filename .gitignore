@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 项目特定
+results/data/*
+!results/data/.gitkeep
+results/figures/*
+!results/figures/.gitkeep
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Git配置文件
+- 指定不需要版本控制的文件
+- 忽略Python缓存文件
+- 忽略IDE配置文件
+- 管理results目录
