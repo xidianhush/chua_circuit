@@ -1,136 +1,54 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-from matplotlib.animation import FuncAnimation
 
-def plot_phase_portrait(X, title='Phase Portrait'):
-    """静态相图绘制"""
-    fig = plt.figure(figsize=(8, 6))
-    ax = fig.add_subplot(111, projection='3d')
-    
-    ax.plot(X[:,0], X[:,1], X[:,2])
-    ax.set_xlabel('v1')
-    ax.set_ylabel('v2')
-    ax.set_zlabel('i3')
-    ax.set_title(title)
-    
-    return fig, ax
-
-def animate_phase_portrait(X, title='Animated Phase Portrait', interval=50):
+def plot_phase_portrait(X, title='Phase Portrait', ax=None):
     """
-    创建动态相图
+    静态相图绘制
     
     参数:
         X: array, 形状为(n, 3)的数组，包含状态变量的时间序列
         title: str, 图的标题
-        interval: int, 动画帧之间的间隔（毫秒）
+        ax: matplotlib轴对象，如果为None则创建新的图形
     """
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    
-    # 设置图形范围
-    ax.set_xlim([np.min(X[:,0]), np.max(X[:,0])])
-    ax.set_ylim([np.min(X[:,1]), np.max(X[:,1])])
-    ax.set_zlim([np.min(X[:,2]), np.max(X[:,2])])
-    
-    # 初始线条
-    line, = ax.plot([], [], [], 'b-', lw=1)
-    point, = ax.plot([], [], [], 'ro', markersize=8)
-    
-    # 设置标题和标签
+    if ax is None:
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111, projection='3d')
+    else:
+        fig = ax.figure
+        
+    ax.plot(X[:,0], X[:,1], X[:,2], 'b-', linewidth=0.5)
     ax.set_xlabel('v1')
     ax.set_ylabel('v2')
     ax.set_zlabel('i3')
     ax.set_title(title)
-    
-    # 初始化函数
-    def init():
-        line.set_data([], [])
-        line.set_3d_properties([])
-        point.set_data([], [])
-        point.set_3d_properties([])
-        return line, point
-
-    # 动画更新函数
-    def update(frame):
-        # 绘制轨迹
-        line.set_data(X[:frame,0], X[:frame,1])
-        line.set_3d_properties(X[:frame,2])
-        
-        # 绘制当前点
-        point.set_data([X[frame,0]], [X[frame,1]])
-        point.set_3d_properties([X[frame,2]])
-        
-        # 动态调整视角
-        ax.view_init(30, frame/2)
-        return line, point
-    
-    # 创建动画
-    anim = FuncAnimation(fig, update, frames=len(X), 
-                        init_func=init, interval=interval,
-                        blit=True)
-    
-    return fig, anim
-
-def plot_time_series(t, X, title='Time Series'):
-    """时间序列图绘制"""
-    fig, ax = plt.subplots(3, 1, figsize=(8, 10))
-    
-    variables = ['v1', 'v2', 'i3']
-    for i in range(3):
-        ax[i].plot(t, X[:,i])
-        ax[i].set_xlabel('Time (s)')
-        ax[i].set_ylabel(variables[i])
-        ax[i].grid(True)
-    
-    fig.suptitle(title)
-    fig.tight_layout()
+    ax.view_init(elev=30, azim=45)
+    ax.grid(True)
     
     return fig, ax
 
-def animate_time_series(t, X, title='Animated Time Series', interval=50):
+def plot_time_series(t, X, title='Time Series', ax=None, component=0, color='b'):
     """
-    创建动态时间序列图
+    时间序列图绘制
     
     参数:
-        t: array, 时间序列（秒）
+        t: array, 时间序列
         X: array, 状态变量的时间序列
         title: str, 图的标题
-        interval: int, 动画帧之间的间隔（毫秒）
+        ax: matplotlib轴对象，如果为None则创建新的图形
+        component: int, 要绘制的分量（0=v1, 1=v2, 2=i3）
+        color: str, 线条颜色
     """
-    fig, axes = plt.subplots(3, 1, figsize=(10, 12))
-    fig.suptitle(title)
-    
-    lines = []
-    points = []
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(8, 6))
+    else:
+        fig = ax.figure
+        
     variables = ['v1', 'v2', 'i3']
+    ax.plot(t, X[:,component], color=color, linewidth=0.8)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel(variables[component])
+    ax.set_title(title)
+    ax.grid(True)
     
-    for i, ax in enumerate(axes):
-        line, = ax.plot([], [], 'b-', lw=1)
-        point, = ax.plot([], [], 'ro', markersize=8)
-        ax.set_xlim(t[0], t[-1])
-        ax.set_ylim(np.min(X[:,i])-0.1, np.max(X[:,i])+0.1)
-        ax.set_xlabel('Time (s)')
-        ax.set_ylabel(variables[i])
-        ax.grid(True)
-        lines.append(line)
-        points.append(point)
-    
-    def init():
-        for line, point in zip(lines, points):
-            line.set_data([], [])
-            point.set_data([], [])
-        return lines + points
-    
-    def update(frame):
-        for i, (line, point) in enumerate(zip(lines, points)):
-            line.set_data(t[:frame], X[:frame,i])
-            point.set_data([t[frame]], [X[frame,i]])
-        return lines + points
-    
-    anim = FuncAnimation(fig, update, frames=len(t),
-                        init_func=init, interval=interval,
-                        blit=True)
-    
-    fig.tight_layout()
-    return fig, anim
+    return fig, ax

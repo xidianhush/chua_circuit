@@ -13,6 +13,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 from src.simulation.solver import solve_chua_system
 from src.simulation.parameters import get_parameters
+from src.visualization.phase_plot import plot_phase_portrait, plot_time_series
 
 class ChuaGUI(QMainWindow):
     def __init__(self):
@@ -40,7 +41,7 @@ class ChuaGUI(QMainWindow):
         # 添加参数滑块
         self.sliders = {}
         param_ranges = {
-            'alpha': (10, 20, 'Alpha'),      # C2/C1
+            'alpha': (5, 20, 'Alpha'),       # 修改alpha的范围为5-20
             'beta': (20, 35, 'Beta'),        # C2/(L*G^2)
             'gamma': (0, 1, 'Gamma')         # r0/(L*G)
         }
@@ -52,6 +53,7 @@ class ChuaGUI(QMainWindow):
             initial_value = int((self.params[param] - min_val) * 1000 / (max_val - min_val))
             slider.setValue(initial_value)
             
+            # 使用浮点数显示参数值
             value_label = QLabel(f'{label}: {self.params[param]:.2f}')
             control_layout.addWidget(value_label)
             control_layout.addWidget(slider)
@@ -85,25 +87,31 @@ class ChuaGUI(QMainWindow):
         # 清除原图
         self.fig.clear()
         
-        # 创建子图
-        ax1 = self.fig.add_subplot(121, projection='3d')
-        ax2 = self.fig.add_subplot(122)
+        # 创建网格布局 2x2
+        # 左上角放相图，右边放三个时间序列图
+        ax1 = self.fig.add_subplot(221, projection='3d')
+        plot_phase_portrait(X, ax=ax1)
         
-        # 绘制相图
-        ax1.plot(X[:,0], X[:,1], X[:,2], 'b-', linewidth=0.5)
-        ax1.set_xlabel('v1 (V)')
-        ax1.set_ylabel('v2 (V)')
-        ax1.set_zlabel('i3 (A)')
-        ax1.set_title('Phase Portrait')
-        ax1.view_init(elev=30, azim=45)
-        ax1.grid(True)
+        # 添加三个时间序列图
+        ax2 = self.fig.add_subplot(222)  # v1
+        ax3 = self.fig.add_subplot(224)  # v2
+        ax4 = self.fig.add_subplot(223)  # i3
         
         # 绘制时间序列
-        ax2.plot(t, X[:,0], 'b-', linewidth=0.8)  # 使用秒为单位
+        ax2.plot(t, X[:,0], 'b-', linewidth=0.8)
         ax2.set_xlabel('Time (s)')
-        ax2.set_ylabel('v1 (V)')
-        ax2.set_title('Time Series of v1')
+        ax2.set_ylabel('v1')
         ax2.grid(True)
+        
+        ax3.plot(t, X[:,1], 'r-', linewidth=0.8)
+        ax3.set_xlabel('Time (s)')
+        ax3.set_ylabel('v2')
+        ax3.grid(True)
+        
+        ax4.plot(t, X[:,2], 'g-', linewidth=0.8)
+        ax4.set_xlabel('Time (s)')
+        ax4.set_ylabel('i3')
+        ax4.grid(True)
         
         self.fig.tight_layout()
         self.canvas.draw()
