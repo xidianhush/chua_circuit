@@ -79,7 +79,7 @@ def plot_time_series(t, X, title='Time Series'):
     variables = ['v1', 'v2', 'i3']
     for i in range(3):
         ax[i].plot(t, X[:,i])
-        ax[i].set_xlabel('Time')
+        ax[i].set_xlabel('Time (s)')
         ax[i].set_ylabel(variables[i])
         ax[i].grid(True)
     
@@ -93,7 +93,7 @@ def animate_time_series(t, X, title='Animated Time Series', interval=50):
     创建动态时间序列图
     
     参数:
-        t: array, 时间序列
+        t: array, 时间序列（秒）
         X: array, 状态变量的时间序列
         title: str, 图的标题
         interval: int, 动画帧之间的间隔（毫秒）
@@ -110,7 +110,7 @@ def animate_time_series(t, X, title='Animated Time Series', interval=50):
         point, = ax.plot([], [], 'ro', markersize=8)
         ax.set_xlim(t[0], t[-1])
         ax.set_ylim(np.min(X[:,i])-0.1, np.max(X[:,i])+0.1)
-        ax.set_xlabel('Time')
+        ax.set_xlabel('Time (s)')
         ax.set_ylabel(variables[i])
         ax.grid(True)
         lines.append(line)

@@ -1,28 +1,31 @@
 import numpy as np
 
-def chua_system(state, t, params):
+def chua_system(t, state, params):
     """
-    Chua电路的核心方程实现
+    Chua电路系统方程
     
     参数:
-        state: array, 状态变量 [v1, v2, i3]
         t: float, 时间点
+        state: array-like, 状态变量 [v1, v2, i3]
         params: dict, 系统参数
         
     返回:
-        dXdt: array, 状态变量的导数
+        array, 状态变量的导数 [dv1/dt, dv2/dt, di3/dt]
     """
-    # 解包当前状态
-    v1, v2, i3 = state    # 两个电压和一个电流
+    # 确保state是numpy数组
+    state = np.asarray(state)
     
-    # 获取参数
+    # 获取状态变量
+    v1, v2, i3 = state[0], state[1], state[2]
+    
+    # 获取系统参数
     alpha = params['alpha']
     beta = params['beta']
     gamma = params['gamma']
     m0 = params['m0']
     m1 = params['m1']
     
-    # 计算非线性函数h(x)
+    # 计算Chua二极管的非线性特性
     h = m1*v1 + 0.5*(m0-m1)*(abs(v1+1) - abs(v1-1))
     
     # Chua系统方程
@@ -30,4 +33,4 @@ def chua_system(state, t, params):
     dv2_dt = v1 - v2 + i3           # 某个步长时刻电容C2电压的变化率
     di3_dt = -beta*v2 - gamma*i3    # 某个步长时刻电感L电流的变化率
     
-    return [dv1_dt, dv2_dt, di3_dt] 
+    return np.array([dv1_dt, dv2_dt, di3_dt]) 
