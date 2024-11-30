@@ -41,5 +41,6 @@ $\frac{du_2}{dt} = u_1 - u_2 + i_3$
 
 $\frac{di_3}{dt} = -\beta u_2$
 ## 3.解方程组
+
 ## 4.结果可视化
 在chua_gui.py中调节$\alpha,\beta$等参数可以观察到电路进入混沌状态的条件。
